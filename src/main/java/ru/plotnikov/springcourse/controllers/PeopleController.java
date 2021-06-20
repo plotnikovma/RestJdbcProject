@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.Valid;
 
 import ru.plotnikov.springcourse.dao.DAO;
-import ru.plotnikov.springcourse.dao.PersonDAOJdbcDriver;
+import ru.plotnikov.springcourse.dao.PersonRepository;
 import ru.plotnikov.springcourse.entity.Person;
 
 /**
@@ -29,14 +29,17 @@ import ru.plotnikov.springcourse.entity.Person;
 @RequestMapping("/people")
 public class PeopleController
 {
-    @Qualifier("personDAOJdbcTemplate")
-    //@Qualifier("personDAOJdbcDriver")
     private final DAO personDAO;
+    private final PersonRepository personRepository;
 
     @Autowired
-    public PeopleController(PersonDAOJdbcDriver personDAO)
+    public PeopleController(@Qualifier("personDAOHibernate") DAO personDAO,
+            PersonRepository personRepository)
+    //@Qualifier("personDAOJdbcTemplate")
+    // @Qualifier("personDAOJdbcDriver")
     {
         this.personDAO = personDAO;
+        this.personRepository = personRepository;
     }
 
     /**
@@ -45,7 +48,8 @@ public class PeopleController
     @GetMapping()
     public String index(Model model)
     {
-        model.addAttribute("people", personDAO.index());
+        //model.addAttribute("people", personDAO.index());
+        model.addAttribute("people", personRepository.findAll());
 
         return "people/index";
     }
@@ -56,7 +60,9 @@ public class PeopleController
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model)
     {
-        model.addAttribute("person", personDAO.show(id));
+        //model.addAttribute("person", personDAO.show(id));
+        model.addAttribute("people", personRepository.findById(id));
+
 
         return "people/show";
     }
@@ -80,7 +86,8 @@ public class PeopleController
         {
             return "people/new";
         }
-        personDAO.sava(person);
+        //personDAO.sava(person);
+        personRepository.save(person);
 
         return "redirect:/people";
     }
@@ -88,7 +95,9 @@ public class PeopleController
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id)
     {
-        model.addAttribute("person",personDAO.show(id));
+        //model.addAttribute("person",personDAO.show(id));
+        model.addAttribute("people", personRepository.findById(id));
+
 
         return "people/edit";
     }
@@ -101,7 +110,8 @@ public class PeopleController
         {
             return "people/edit";
         }
-        personDAO.update(id, person);
+        //personDAO.update(id, person);
+        personRepository.save(person);
 
         return "redirect:/people";
     }
@@ -109,7 +119,9 @@ public class PeopleController
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id)
     {
-        personDAO.delete(id);
+        //personDAO.delete(id);
+
+        personRepository.deleteById(id);
 
         return "redirect:/people";
     }

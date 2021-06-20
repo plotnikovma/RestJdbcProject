@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ru.plotnikov.springcourse.entity.Person;
-import ru.plotnikov.springcourse.utils.ConnectionUtils;
+import ru.plotnikov.springcourse.utils.JdbcUtil;
 
 /**
  * Реализация DAO через JDBC Driver
@@ -22,12 +22,12 @@ import ru.plotnikov.springcourse.utils.ConnectionUtils;
 @Component
 public class PersonDAOJdbcDriver implements DAO
 {
-    private final ConnectionUtils connectionUtils;
+    private final JdbcUtil jdbcUtil;
 
     @Autowired
-    public PersonDAOJdbcDriver(ConnectionUtils connectionUtils)
+    public PersonDAOJdbcDriver(JdbcUtil jdbcUtil)
     {
-        this.connectionUtils = connectionUtils;
+        this.jdbcUtil = jdbcUtil;
     }
 
     /**
@@ -36,7 +36,7 @@ public class PersonDAOJdbcDriver implements DAO
     public List<Person> index()
     {
         final List<Person> personList = new ArrayList<>();
-        try (Statement statement = connectionUtils.getConnection().createStatement();)
+        try (Statement statement = jdbcUtil.getConnection().createStatement();)
         {
             String query = "SELECT * FROM person;";
             ResultSet result = statement.executeQuery(query);
@@ -65,7 +65,7 @@ public class PersonDAOJdbcDriver implements DAO
     public Person show(int id)
     {
         Person person = null;
-        try (PreparedStatement preparedStatement = connectionUtils.getConnection().prepareStatement("SELECT * FROM Person WHERE id = ?"))
+        try (PreparedStatement preparedStatement = jdbcUtil.getConnection().prepareStatement("SELECT * FROM Person WHERE id = ?"))
         {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -87,7 +87,7 @@ public class PersonDAOJdbcDriver implements DAO
 
     public void sava(Person person)
     {
-        try (PreparedStatement preparedStatement = connectionUtils.getConnection().prepareStatement("INSERT INTO person VALUES (1, ?, ?, ?)"))
+        try (PreparedStatement preparedStatement = jdbcUtil.getConnection().prepareStatement("INSERT INTO person VALUES (1, ?, ?, ?)"))
         {
             preparedStatement.setString(1, person.getName());
             preparedStatement.setInt(2, person.getAge());
@@ -103,7 +103,7 @@ public class PersonDAOJdbcDriver implements DAO
 
     public void update(int id, Person person)
     {
-        try (PreparedStatement preparedStatement = connectionUtils.getConnection().prepareStatement("UPDATE Person SET name=?, "
+        try (PreparedStatement preparedStatement = jdbcUtil.getConnection().prepareStatement("UPDATE Person SET name=?, "
                 + "age=?, email=? WHERE id=?"))
         {
             preparedStatement.setString(1, person.getName());
@@ -121,7 +121,7 @@ public class PersonDAOJdbcDriver implements DAO
 
     public void delete(int id)
     {
-        try (PreparedStatement preparedStatement = connectionUtils.getConnection().prepareStatement("DELETE FROM Person WHERE id=?"))
+        try (PreparedStatement preparedStatement = jdbcUtil.getConnection().prepareStatement("DELETE FROM Person WHERE id=?"))
         {
             preparedStatement.setInt(1, id);
 

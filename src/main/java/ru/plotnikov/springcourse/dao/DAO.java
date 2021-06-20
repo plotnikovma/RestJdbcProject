@@ -5,7 +5,7 @@ import java.util.List;
 import ru.plotnikov.springcourse.entity.Person;
 
 /**
- *
+ * Интерфейс, который реализуют DAO классы
  *
  * @author mplotnikov
  * @since 20.06.2021
